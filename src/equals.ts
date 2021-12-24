@@ -29,6 +29,7 @@ export const deepEquals = (a: any, b: any): boolean => {
     // Objects don't have the same amount of keys
     if (keysA.length !== keysB.length) return false;
 
+    // tslint:disable-next-line:prefer-for-of
     for (let index = 0; index < keysA.length; ++index) {
       const keyA = keysA[index];
       // One of the keys are not the same
