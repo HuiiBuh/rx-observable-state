@@ -1,24 +1,7 @@
 import { Store } from './store';
-import { Constructor } from './types';
 
-export const addCapabilities = <T extends object>() => {
-  return <S extends Constructor<Store<T>, T>>(store: S): Constructor<Store<T> & Dispatcher<T>, T> => {
-    // @ts-ignore
-    return class extends store implements Dispatcher<T> {
-      constructor(...args: [any, any]) {
-        super(...args);
-      }
+export type StoreContext<T extends object> = Pick<Store<T, never>, 'get' | 'state' | 'patch' | 'setState'>;
 
-      public dispatch(): void {
-      }
-    };
-  };
-};
-
-interface Dispatcher<T> {
-  dispatch(): void;
+export interface StoreDispatcher<T extends object> {
+  [key: string]: (...args: any[]) => any;
 }
-
-const NewState = addCapabilities<{ hello: string }>()(Store);
-const s = new NewState({hello: ''}, {deepEqual: true});
-s.dispatch();

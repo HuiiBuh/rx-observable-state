@@ -1,5 +1,25 @@
+class Stack {
+  private readonly list: any[];
+
+  constructor(...items: any[]) {
+    this.list = items;
+  }
+
+  public get notEmpty(): boolean {
+    return this.list.length > 0;
+  }
+
+  public push(o: any): void {
+    this.list.push(o);
+  }
+
+  public pop(): any {
+    return this.list.pop();
+  }
+}
+
 export const shallowEquals = (a: any, b: any) => a === b;
-export const arePrimitives = (...objects: any[]) => objects.every(o => !(o instanceof Object));
+export const arePrimitives = (...objects: any[]) => objects.every((o) => !(o instanceof Object));
 
 const comparator = (a: any, b: any): boolean | null => {
   if (shallowEquals(a, b)) return true;
@@ -11,16 +31,14 @@ export const deepEquals = (a: any, b: any): boolean => {
   const topEqual = comparator(a, b);
   if (typeof topEqual === 'boolean') return topEqual;
 
-
   // Create iterators which will iterate over the objects and the children of the objects
-  const objectAIterator = [a];
-  const objectBIterator = [b];
+  const objectAIterator = new Stack(a);
+  const objectBIterator = new Stack(b);
 
-  for (let objectIndex = 0; objectIndex < objectAIterator.length; ++objectIndex) {
-
+  while (objectAIterator.notEmpty) {
     // Get the objects themselves
-    const objectA = objectAIterator[objectIndex];
-    const objectB = objectBIterator[objectIndex];
+    const objectA = objectAIterator.pop();
+    const objectB = objectBIterator.pop();
 
     // Get the keys of the objects
     const keysA = Object.keys(objectA);
