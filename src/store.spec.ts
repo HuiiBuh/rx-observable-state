@@ -1,4 +1,5 @@
 import { Store } from './store';
+import { getDummyStore } from './store.provider.spec';
 
 test('Check if initial state gets created', () => {
   const s = new Store({ hello: { world: 'asdf' }, world: 'test' });
@@ -32,4 +33,12 @@ test('Check if only required filed was updated', () => {
   s.patch('updated', 'update');
   const newState = s.get('hello');
   expect(oldState).toBe(newState);
+});
+
+test('Test if you get notified if value in store changes', () => {
+  const s = getDummyStore();
+  s.on('deep', 'nested', 'object').subscribe((newValue) => {
+    expect(newValue).toStrictEqual(['new']);
+  });
+  s.patch(['new'], 'deep', 'nested', 'object');
 });

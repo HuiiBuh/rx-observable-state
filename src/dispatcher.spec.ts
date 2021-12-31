@@ -1,4 +1,4 @@
-import { getDummyStore } from './_dummy-store.spec';
+import { getDummyStore } from './store.provider.spec';
 
 test('If the string array list gets cleared', () => {
   const store = getDummyStore();

@@ -3,7 +3,7 @@ import { List } from 'ts-toolbelt';
 import { StoreContext, StoreDispatcher } from './dispatcher';
 
 import { deepEquals } from './equals';
-import { StoreTypeProvider } from './store-type-provider';
+import { StoreTypes } from './store-types';
 
 type Index = string | number | symbol;
 const isPrimitive = (object: any) => !(object instanceof Object);
@@ -13,10 +13,7 @@ export interface StoreConstructorOptions<D> {
   dispatcher?: D;
 }
 
-export class Store<
-  S extends object,
-  D extends StoreDispatcher<S> | undefined = undefined,
-> extends StoreTypeProvider<S> {
+export class Store<S extends object, D extends StoreDispatcher<S> | undefined = undefined> extends StoreTypes<S> {
   public state$: Observable<S>;
   protected dispatcher: D | undefined;
   private readonly comparator: (a: any, b: any) => boolean;

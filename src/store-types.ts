@@ -2,7 +2,7 @@ import { Observable } from 'rxjs';
 
 type Index = string | number | symbol;
 
-export abstract class StoreTypeProvider<S> {
+export abstract class StoreTypes<S> {
   public on<P1 extends keyof S, V extends S[P1]>(part1: P1): Observable<V>;
   public on<P1 extends keyof S, P2 extends keyof S[P1], V extends S[P1][P2]>(part1: P1, part2: P2): Observable<V>;
   public on<P1 extends keyof S, P2 extends keyof S[P1], P3 extends keyof S[P1][P2], V extends S[P1][P2][P3]>(
