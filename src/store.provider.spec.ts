@@ -12,6 +12,7 @@ type DummyStoreType = {
 };
 
 const dispatcher = {
+  iAmIgnored: 'sdfghj',
   clearStringArray(store: StoreContext<DummyStoreType>): void {
     store.patch([] as string[], 'deep', 'nested', 'object');
   },
@@ -19,7 +20,7 @@ const dispatcher = {
     const array = store.state.deep.nested.and;
     store.patch([...array, newNumber], 'deep', 'nested', 'and');
   },
-} as const;
+};
 
 export const getDummyStore = () => {
   return new Store<DummyStoreType, typeof dispatcher>(

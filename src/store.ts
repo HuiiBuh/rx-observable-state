@@ -1,6 +1,5 @@
 import { BehaviorSubject, distinctUntilChanged, map, Observable } from 'rxjs';
-import { List } from 'ts-toolbelt';
-import { StoreContext, StoreDispatcher } from './dispatcher';
+import { DispatcherFunctionParameter, DispatcherFunctions } from './dispatcher';
 
 import { deepEquals } from './equals';
 import { StoreTypes } from './store-types';
@@ -13,7 +12,7 @@ export interface StoreConstructorOptions<D> {
   dispatcher?: D;
 }
 
-export class Store<S extends object, D extends StoreDispatcher<S> | undefined = undefined> extends StoreTypes<S> {
+export class Store<S extends object, D extends object | undefined = undefined> extends StoreTypes<S> {
   public state$: Observable<S>;
   protected dispatcher: D | undefined;
   private readonly comparator: (a: any, b: any) => boolean;
@@ -35,17 +34,19 @@ export class Store<S extends object, D extends StoreDispatcher<S> | undefined = 
     this._state$.next(state);
   }
 
-  public dispatch<A extends keyof D>(
-    action: D extends undefined ? 'Please pass a dispatcher to the constructor' : A,
-    ...args: D extends undefined ? never[] : List.Filter<Parameters<NonNullable<D>[A]>, StoreContext<S>>
+  public dispatch<A extends DispatcherFunctions<NonNullable<D>>>(
+    action: D extends undefined ? never : A,
+    ...args: D extends undefined ? never[] : DispatcherFunctionParameter<NonNullable<D>[A], S>
   ): void {
     if (!this.dispatcher) {
-      console.warn('Pass a dispatcher as to the constructor');
+      console.warn('Pass a dispatcher to the constructor');
       return;
     }
 
-    const actionFunction = (this.dispatcher as NonNullable<D>)[action];
-    if (!action) {
+    const actionFunction = (this.dispatcher as NonNullable<D>)[action] as unknown as (
+      ...args: any[]
+    ) => any | undefined;
+    if (!actionFunction) {
       console.warn(`Action ${action} was not found in the dispatcher. Make sure that the action actually exists`);
       return;
     }
