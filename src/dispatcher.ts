@@ -10,3 +10,7 @@ export type DispatcherFunctionParameter<T, S extends object> = List.Filter<
   T extends (...args: any[]) => any ? Parameters<T> : never[],
   StoreContext<S>
 >;
+
+export interface IDispatcher {
+  [key: string]: (...args: any[]) => any;
+}
