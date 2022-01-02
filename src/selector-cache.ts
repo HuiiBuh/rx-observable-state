@@ -1,8 +1,9 @@
 import { combineLatest, distinctUntilChanged, map, Observable } from 'rxjs';
 import { DependableSelector, ISelector, isSelector, Selector } from './selector';
+import { Index } from './types';
 
 export class SelectorCache<T extends object> {
-  private cache: Record<string, Observable<any>> = {};
+  private cache: Record<Index, Observable<any>> = {};
 
   constructor(
     private store: Observable<T>,
@@ -10,16 +11,16 @@ export class SelectorCache<T extends object> {
     private comparator: (a: any, b: any) => boolean,
   ) {}
 
-  public observeTo(selector: string): Observable<any> {
+  public observeTo(selector: Index): Observable<any> {
     if (selector in this.cache) return this.cache[selector];
     const executor = this.selector[selector];
     if (isSelector(executor)) {
       return this.observableFromSelector(selector, executor);
     }
-    return this.observableFromDependableSelector(selector, executor as DependableSelector<T>);
+    return this.observableFromDependableSelector(selector, executor as DependableSelector);
   }
 
-  private observableFromSelector(selector: string, executor: Selector<any>): Observable<any> {
+  private observableFromSelector(selector: Index, executor: Selector<any>): Observable<any> {
     this.cache[selector] = this.store.pipe(
       map((state) => executor.apply(this.selector, [state])),
       distinctUntilChanged(this.comparator),
@@ -27,7 +28,7 @@ export class SelectorCache<T extends object> {
     return this.cache[selector];
   }
 
-  private observableFromDependableSelector(selector: string, executor: DependableSelector<any>): Observable<any> {
+  private observableFromDependableSelector(selector: Index, executor: DependableSelector): Observable<any> {
     this.createCacheForDependencies(executor.dependencies);
     this.cache[selector] = combineLatest(executor.dependencies.map((d) => this.cache[d])).pipe(
       map((values) => executor.selector.apply(this.selector, values)),

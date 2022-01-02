@@ -22,8 +22,24 @@ const dispatcher = {
   },
 };
 
+const selector = {
+  iAmIgnored: 'sdfghj',
+  getHello(store: DummyStoreType): string {
+    return store.hello;
+  },
+  getNumberArray(store: DummyStoreType): number[] {
+    return store.deep.nested.and;
+  },
+  concatArrayLengthWithHello: {
+    selector(array: number[], hello: string): string {
+      return `${hello}${array.length}`;
+    },
+    dependencies: ['getNumberArray', 'getHello'],
+  },
+};
+
 export const getDummyStore = () => {
-  return new Store<DummyStoreType, typeof dispatcher>(
+  return new Store<DummyStoreType, typeof dispatcher, typeof selector>(
     {
       hello: 'world',
       deep: {
@@ -35,6 +51,7 @@ export const getDummyStore = () => {
     },
     {
       dispatcher,
+      selector,
     },
   );
 };

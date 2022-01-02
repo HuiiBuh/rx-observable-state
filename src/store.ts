@@ -2,11 +2,11 @@ import { BehaviorSubject, distinctUntilChanged, map, Observable } from 'rxjs';
 import { DispatcherFunctionParameter, DispatcherFunctions } from './dispatcher';
 
 import { deepEquals } from './equals';
-import { ISelector } from './selector';
+import { ISelector, SelectorFunctions, SelectorReturnType } from './selector';
 import { SelectorCache } from './selector-cache';
 import { StoreTypes } from './store-types';
+import { Index } from './types';
 
-type Index = string | number | symbol;
 const isPrimitive = (object: any) => !(object instanceof Object);
 
 export interface StoreConstructorOptions<D, S> {
@@ -50,7 +50,9 @@ export class Store<
     this._state$.next(state);
   }
 
-  public select<A extends keyof SELECTOR & string>(selector: A): Observable<any> {
+  public select<A extends SelectorFunctions<NonNullable<SELECTOR>, S> & keyof SELECTOR>(
+    selector: A,
+  ): Observable<SelectorReturnType<SELECTOR, A>> {
     if (!this.selector || !this.selectorCache) throw new Error('Pass a selector to the constructor');
     if (!(selector in this.selector)) {
       throw new Error(`Selector ${selector} was not found in the selector. Make sure that the action actually exists`);

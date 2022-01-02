@@ -27,7 +27,7 @@ test('Check if immutability was preserved', () => {
   expect(oldState).toEqual(newState);
 });
 
-test('Check if only required filed was updated', () => {
+test('Check if only required field was updated', () => {
   const s = new Store<{ hello: { world: string }; update: string }>({ hello: { world: 'a' }, update: 'me' });
   const oldState = s.get('hello');
   s.patch('updated', 'update');
@@ -37,8 +37,11 @@ test('Check if only required filed was updated', () => {
 
 test('Test if you get notified if value in store changes', () => {
   const s = getDummyStore();
+  const expected = [['with', 'arrays'], ['new']];
+  let index = 0;
   s.on('deep', 'nested', 'object').subscribe((newValue) => {
-    expect(newValue).toStrictEqual(['new']);
+    expect(newValue).toStrictEqual(expected[index]);
+    ++index;
   });
   s.patch(['new'], 'deep', 'nested', 'object');
 });
