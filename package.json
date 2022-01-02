@@ -1,5 +1,5 @@
 {
-  "name": "ngx-hui-state",
+  "name": "rx-observable-state",
   "version": "1.0.0",
   "main": "dist/index.js",
   "license": "MIT",
@@ -8,6 +8,7 @@
     "build:w": "tsc -p tsconfig.json -w",
     "test": "jest",
     "format": "prettier --write .",
+    "coverage": "jest --collect-coverage",
     "lint": "tslint -p tsconfig.json",
     "minifyJson": "jq -c . < assets/json1.json > assets/json1.tmp.json && jq -c . < assets/json2.json > assets/json2.tmp.json && mv assets/json1.tmp.json assets/json1.json && mv assets/json2.tmp.json assets/json2.json"
   },

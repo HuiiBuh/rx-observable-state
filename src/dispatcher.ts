@@ -11,5 +11,5 @@ export type DispatcherFunctionParameter<T, S extends object> = List.Filter<
 >;
 
 export type IDispatcher = {
-  [key: Index]: (...args: any[]) => any;
+  [key: Index]: ((...args: any[]) => any) | any;
 };

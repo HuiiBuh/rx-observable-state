@@ -3,13 +3,19 @@ import { Index, KeysOfType } from './types';
 export type Selector<S extends object> = (context: S) => any;
 export type DependableSelector = {
   selector: (...args: any[]) => any;
-  dependencies: string[];
+  dependencies: Index[];
 };
 
 export const isSelector = (f: Selector<any> | DependableSelector): f is Selector<any> => typeof f === 'function';
+export const isDependableSelector = (f: any): f is DependableSelector =>
+  typeof f === 'object' &&
+  'dependencies' in f &&
+  Array.isArray(f.dependencies) &&
+  'selector' in f &&
+  typeof f.selector === 'function';
 
 export type ISelector<S extends object> = {
-  [key: Index]: DependableSelector | Selector<S>;
+  [key: Index]: DependableSelector | Selector<S> | any;
 };
 
 export type SelectorFunctions<SELECTOR extends object, STATE extends object> = KeysOfType<

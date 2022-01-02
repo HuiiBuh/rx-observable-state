@@ -34,6 +34,17 @@ test('Check if only required field was updated', () => {
   const newState = s.get('hello');
   expect(oldState).toBe(newState);
 });
+test('Check if error gets thrown if you try to call a wrong selector or action', () => {
+  const s = getDummyStore();
+  expect(() => {
+    // @ts-ignore
+    s.select('non-existent');
+  }).toThrow();
+  expect(() => {
+    // @ts-ignore
+    s.dispatch('non-existent');
+  }).toThrow();
+});
 
 test('Test if you get notified if value in store changes', () => {
   const s = getDummyStore();
