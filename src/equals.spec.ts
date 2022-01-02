@@ -42,7 +42,7 @@ test('Check if the different json objects are equal', () => {
 });
 
 test('Make the object really large and check if still the same', () => {
-  const huge = { a: new Array(500).fill(json1), b: new Array(500).fill(json1) };
+  const huge = { a: new Array(50).fill(json1), b: new Array(50).fill(json1) };
   const object1 = JSON.parse(JSON.stringify(huge));
   const object2 = JSON.parse(JSON.stringify(huge));
   expect(deepEquals(object1, object2)).toBe(true);
