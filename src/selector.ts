@@ -23,14 +23,12 @@ export type SelectorFunctions<SELECTOR extends object, STATE extends object> = K
   Selector<STATE> | DependableSelector
 >;
 
-type ExtractPromiseIfPromise<T> = T extends Promise<any> ? Awaited<T> : T;
-
 export type SelectorReturnType<
   SELECTOR,
   ACCESSOR extends keyof SELECTOR,
   ITEM = SELECTOR[ACCESSOR],
 > = ITEM extends Selector<any>
-  ? ExtractPromiseIfPromise<ReturnType<ITEM>>
+  ? ReturnType<ITEM>
   : ITEM extends DependableSelector
-  ? ExtractPromiseIfPromise<ReturnType<ITEM['selector']>>
+  ? ReturnType<ITEM['selector']>
   : never;

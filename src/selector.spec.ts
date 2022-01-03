@@ -1,5 +1,6 @@
 import { lastValueFrom, Observable } from 'rxjs';
 import { observableToBehaviourSubject } from './selector-cache';
+import { Store } from './store';
 import { getDummyStore } from './store.provider.spec';
 
 test('Check if the selector works', () => {
@@ -28,8 +29,11 @@ test('Check selector for current value', () => {
   const hello = store.selectCurrent('getHello');
   expect(hello).toBe('world');
   store.patch('new', 'hello');
-  const newValue = store.selectCurrent('getHello');
-  expect(newValue).toBe('new');
+  // Just wait a bit
+  setTimeout(() => {
+    const newValue = store.selectCurrent('getHello');
+    expect(newValue).toBe('new');
+  });
 });
 
 test('Check if invalid selector throws exception', () => {
@@ -46,15 +50,32 @@ test('Test toObservable next', async () => {
     s.next('next');
     s.complete();
   });
-  const sub = observableToBehaviourSubject(ob);
-  expect(await lastValueFrom(sub)).toBe('next');
+  const sub = observableToBehaviourSubject(ob, '');
+
+  setTimeout(async () => {
+    expect(await lastValueFrom(sub)).toBe('next');
+  });
 });
 
 test('Test toObservable error', async () => {
   const ob = new Observable<string>((s) => s.error('error'));
-  const sub = observableToBehaviourSubject(ob);
+  const sub = observableToBehaviourSubject(ob, '');
 
   await expect(async () => {
     await lastValueFrom(sub);
   }).rejects.toEqual('error');
+});
+
+test('Test async selector', async () => {
+  const store = new Store(
+    {},
+    {
+      selector: {
+        asyncSelector: async () => 'result',
+      },
+    },
+  );
+
+  const result: Promise<string> = store.selectCurrent('asyncSelector');
+  expect(result).toBeInstanceOf(Promise);
 });

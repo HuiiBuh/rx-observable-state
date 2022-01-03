@@ -32,8 +32,7 @@ const selector = {
     // Gets called every time the value of the selector function changes
     dependencies: ['getDoneTodos'],
   },
-  // Selectors can ba async. The return value in this case would be bool and not PromiseBool, because the promise gets
-  // striped away by the state
+  // Selectors can ba async. The return value in this case would be not Promise<boolean>
   asyncSelector: async (state: TodoState) => {
     await new Promise((resolve) => setTimeout(resolve, 200));
     return state.allDone;
@@ -99,8 +98,8 @@ const store = new Store<
   },
 );
 
-store.select('asyncSelector').subscribe((value) => {
-  console.log(value);
+store.select('asyncSelector').subscribe(async (value) => {
+  console.log(await value);
 });
 
 store.select('getDoneTodos').subscribe((value) => {

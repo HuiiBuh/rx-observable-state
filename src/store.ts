@@ -1,4 +1,4 @@
-import { BehaviorSubject, defer, distinctUntilChanged, map, Observable } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, from, map, Observable } from 'rxjs';
 import { DispatcherFunctionParameter, DispatcherFunctions } from './dispatcher';
 
 import { deepEquals } from './equals';
@@ -38,7 +38,7 @@ export class Store<
     this._state$ = new BehaviorSubject(initialState);
     this.state$ = this._state$.asObservable();
     if (this.selector) {
-      this.selectorCache = new SelectorCache(this.state$, this.selector as ISelector<S>, this.comparator);
+      this.selectorCache = new SelectorCache(this._state$, this.selector as ISelector<S>, this.comparator);
     }
   }
 
@@ -84,10 +84,8 @@ export class Store<
     if (!actionFunction) {
       throw new Error(`Action ${action} was not found in the dispatcher. Make sure that the action actually exists`);
     }
-    return defer(async () => {
-      await actionFunction.apply(this.dispatcher, [...args, this]);
-      return this.state;
-    });
+    const result = actionFunction.apply(this.dispatcher, [this, ...args]);
+    return from(result instanceof Promise ? result.then(() => [this.state]) : [this.state]).pipe(map(() => this.state));
   }
 
   protected _on(path: Index[]): Observable<any> {

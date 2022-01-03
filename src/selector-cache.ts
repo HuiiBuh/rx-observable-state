@@ -6,7 +6,7 @@ export class SelectorCache<T extends object> {
   private cache: Record<Index, BehaviorSubject<any>> = {};
 
   constructor(
-    private store: Observable<T>,
+    private store: Omit<BehaviorSubject<T>, 'next'>,
     private selector: ISelector<T>,
     private comparator: (a: any, b: any) => boolean,
   ) {
@@ -19,7 +19,7 @@ export class SelectorCache<T extends object> {
   }
 
   public observeTo(selector: Index): Observable<any> {
-    if (selector in this.cache) return this.cache[selector];
+    if (selector in this.cache) return this.cache[selector].asObservable();
     const executor = this.selector[selector];
     if (isSelector(executor)) {
       return this.observableFromSelector(selector, executor).asObservable();
@@ -52,7 +52,8 @@ export class SelectorCache<T extends object> {
       switchMap((state) => defer(async () => await executor.apply(this.selector, [state]))),
       distinctUntilChanged(this.comparator),
     );
-    this.cache[selector] = observableToBehaviourSubject(observable);
+    const initial = executor.apply(this.selector, [this.store.value]);
+    this.cache[selector] = observableToBehaviourSubject(observable, initial);
     return this.cache[selector];
   }
 
@@ -61,7 +62,12 @@ export class SelectorCache<T extends object> {
     const observable = combineLatest(executor.dependencies.map((d) => this.cache[d])).pipe(
       map((values) => executor.selector.apply(this.selector, values)),
     );
-    this.cache[selector] = observableToBehaviourSubject(observable);
+    const initial = executor.selector.apply(
+      this.selector,
+      executor.dependencies.map((d) => this.cache[d].value),
+    );
+    this.cache[selector] = observableToBehaviourSubject(observable, initial);
+
     return this.cache[selector];
   }
 
@@ -70,8 +76,8 @@ export class SelectorCache<T extends object> {
   }
 }
 
-export const observableToBehaviourSubject = <T>(observable: Observable<T>): BehaviorSubject<T> => {
-  const subject = new BehaviorSubject<T>(null as any);
+export const observableToBehaviourSubject = <T>(observable: Observable<T>, initialValue: T): BehaviorSubject<T> => {
+  const subject = new BehaviorSubject<T>(initialValue);
   observable.subscribe({
     complete: () => subject.complete(),
     error: (err: any) => subject.error(err),

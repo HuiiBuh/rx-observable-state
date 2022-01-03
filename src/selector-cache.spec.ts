@@ -1,10 +1,10 @@
-import { Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { SelectorCache } from './selector-cache';
 
 test('Check if invalid dependencies get filtered out', () => {
   const createInvalidCache = () => {
     return new SelectorCache(
-      new Observable<object>(),
+      new BehaviorSubject<object>({}),
       {
         // @ts-ignore
         world: 'not-valid',
@@ -21,7 +21,7 @@ test('Check if invalid dependencies get filtered out', () => {
 
 test('Check if passing an invalid key throws', () => {
   const cache = new SelectorCache(
-    new Observable<object>(),
+    new BehaviorSubject<object>({}),
     {
       // @ts-ignore
       invalidDep: {
