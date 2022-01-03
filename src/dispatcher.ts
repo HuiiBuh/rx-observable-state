@@ -1,15 +1,15 @@
 import { List } from 'ts-toolbelt';
 import { Store } from './store';
-import { Index, KeysOfType } from './types';
+import { KeysOfType } from './types';
 
-export type StoreContext<T extends object> = Pick<Store<T, never>, 'get' | 'state' | 'patch' | 'setState'>;
-
-export type DispatcherFunctions<T extends object> = KeysOfType<T, (...args: any[]) => any>;
-export type DispatcherFunctionParameter<T, S extends object> = List.Filter<
-  T extends (...args: any[]) => any ? Parameters<T> : never[],
-  StoreContext<S>
+export type StoreContext<T extends object, SELECTOR extends object = object, DISPATCHER extends object = object> = Pick<
+  Store<T, DISPATCHER, SELECTOR>,
+  'get' | 'state' | 'patch' | 'setState' | 'dispatch' | 'selectCurrent'
 >;
 
-export type IDispatcher = {
-  [key: Index]: ((...args: any[]) => any) | any;
-};
+export type DispatcherFunction = (state: StoreContext<any>, ...args: any[]) => any;
+export type DispatcherFunctions<T extends object> = KeysOfType<T, DispatcherFunction>;
+export type DispatcherFunctionParameter<T, S extends object> = List.Filter<
+  T extends DispatcherFunction ? Parameters<T> : never[],
+  StoreContext<S>
+>;

@@ -6,6 +6,7 @@ test('Check if invalid dependencies get filtered out', () => {
     return new SelectorCache(
       new Observable<object>(),
       {
+        // @ts-ignore
         world: 'not-valid',
         invalidDep: {
           selector: () => null,
@@ -22,6 +23,7 @@ test('Check if passing an invalid key throws', () => {
   const cache = new SelectorCache(
     new Observable<object>(),
     {
+      // @ts-ignore
       invalidDep: {
         selector: () => null,
       },

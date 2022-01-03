@@ -61,6 +61,17 @@ export class Store<
     return this.selectorCache.observeTo(selector);
   }
 
+  public selectCurrent<A extends SelectorFunctions<NonNullable<SELECTOR>, S> & keyof SELECTOR>(
+    selector: A,
+  ): SelectorReturnType<SELECTOR, A> {
+    if (!this.selector || !this.selectorCache) throw new Error('Pass a selector to the constructor');
+    if (!(selector in this.selector)) {
+      throw new Error(`Selector ${selector} was not found in the selector. Make sure that the action actually exists`);
+    }
+
+    return this.selectorCache.get(selector);
+  }
+
   public dispatch<A extends DispatcherFunctions<NonNullable<DISPATCHER>>>(
     action: DISPATCHER extends undefined ? never : A,
     ...args: DISPATCHER extends undefined ? never[] : DispatcherFunctionParameter<NonNullable<DISPATCHER>[A], S>

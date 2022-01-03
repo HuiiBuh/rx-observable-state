@@ -1,2 +1,2 @@
 export { Store, StoreConstructorOptions } from './store';
-export { IDispatcher, StoreContext } from './dispatcher';
+export { StoreContext } from './dispatcher';

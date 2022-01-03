@@ -15,7 +15,7 @@ export const isDependableSelector = (f: any): f is DependableSelector =>
   typeof f.selector === 'function';
 
 export type ISelector<S extends object> = {
-  [key: Index]: DependableSelector | Selector<S> | any;
+  [key: Index]: DependableSelector | Selector<S>;
 };
 
 export type SelectorFunctions<SELECTOR extends object, STATE extends object> = KeysOfType<

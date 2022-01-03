@@ -1,9 +1,9 @@
-import { combineLatest, distinctUntilChanged, map, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, distinctUntilChanged, map, Observable } from 'rxjs';
 import { DependableSelector, isDependableSelector, ISelector, isSelector, Selector } from './selector';
 import { Index } from './types';
 
 export class SelectorCache<T extends object> {
-  private cache: Record<Index, Observable<any>> = {};
+  private cache: Record<Index, BehaviorSubject<any>> = {};
 
   constructor(
     private store: Observable<T>,
@@ -11,6 +11,22 @@ export class SelectorCache<T extends object> {
     private comparator: (a: any, b: any) => boolean,
   ) {
     this.validateDependableSelectors();
+  }
+
+  public get(selector: Index): any {
+    if (!(selector in this.cache)) this.observeTo(selector);
+    return this.cache[selector].value;
+  }
+
+  public observeTo(selector: Index): Observable<any> {
+    if (selector in this.cache) return this.cache[selector];
+    const executor = this.selector[selector];
+    if (isSelector(executor)) {
+      return this.observableFromSelector(selector, executor).asObservable();
+    } else if (isDependableSelector(executor)) {
+      return this.observableFromDependableSelector(selector, executor).asObservable();
+    }
+    throw new Error(`Selector ${String(selector)} is not a valid selector`);
   }
 
   private validateDependableSelectors(): void {
@@ -30,30 +46,21 @@ export class SelectorCache<T extends object> {
     return Object.entries(this.selector).filter((e) => isDependableSelector(e[1])) as [Index, DependableSelector][];
   }
 
-  public observeTo(selector: Index): Observable<any> {
-    if (selector in this.cache) return this.cache[selector];
-    const executor = this.selector[selector];
-    if (isSelector(executor)) {
-      return this.observableFromSelector(selector, executor);
-    } else if (isDependableSelector(executor)) {
-      return this.observableFromDependableSelector(selector, executor);
-    }
-    throw new Error(`Selector ${String(selector)} is not a valid selector`);
-  }
-
-  private observableFromSelector(selector: Index, executor: Selector<any>): Observable<any> {
-    this.cache[selector] = this.store.pipe(
+  private observableFromSelector(selector: Index, executor: Selector<any>): BehaviorSubject<any> {
+    const observable = this.store.pipe(
       map((state) => executor.apply(this.selector, [state])),
       distinctUntilChanged(this.comparator),
     );
+    this.cache[selector] = observableToBehaviourSubject(observable);
     return this.cache[selector];
   }
 
-  private observableFromDependableSelector(selector: Index, executor: DependableSelector): Observable<any> {
+  private observableFromDependableSelector(selector: Index, executor: DependableSelector): BehaviorSubject<any> {
     this.createCacheForDependencies(executor.dependencies);
-    this.cache[selector] = combineLatest(executor.dependencies.map((d) => this.cache[d])).pipe(
+    const observable = combineLatest(executor.dependencies.map((d) => this.cache[d])).pipe(
       map((values) => executor.selector.apply(this.selector, values)),
     );
+    this.cache[selector] = observableToBehaviourSubject(observable);
     return this.cache[selector];
   }
 
@@ -61,3 +68,13 @@ export class SelectorCache<T extends object> {
     dependencies.filter((d) => !(d in this.cache)).forEach((d) => this.observeTo(d));
   }
 }
+
+export const observableToBehaviourSubject = <T>(observable: Observable<T>): BehaviorSubject<T> => {
+  const subject = new BehaviorSubject<T>(null as any);
+  observable.subscribe({
+    complete: () => subject.complete(),
+    error: (err: any) => subject.error(err),
+    next: (value: T) => subject.next(value),
+  });
+  return subject;
+};
