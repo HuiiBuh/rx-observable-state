@@ -1,4 +1,4 @@
-import { lastValueFrom, Observable } from 'rxjs';
+import { lastValueFrom, Observable, Subject } from 'rxjs';
 import { observableToBehaviourSubject } from './selector-cache';
 import { Store } from './store';
 import { getDummyStore } from './store.provider.spec';
@@ -24,16 +24,15 @@ test('Check if dependable selector works', () => {
   });
 });
 
-test('Check selector for current value', () => {
+test('Check selector for current value', async () => {
   const store = getDummyStore();
   const hello = store.selectCurrent('getHello');
   expect(hello).toBe('world');
   store.patch('new', 'hello');
   // Just wait a bit
-  setTimeout(() => {
-    const newValue = store.selectCurrent('getHello');
-    expect(newValue).toBe('new');
-  });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  const newValue = store.selectCurrent('getHello');
+  expect(newValue).toBe('new');
 });
 
 test('Check if invalid selector throws exception', () => {
@@ -46,15 +45,13 @@ test('Check if invalid selector throws exception', () => {
 });
 
 test('Test toObservable next', async () => {
-  const ob = new Observable<string>((s) => {
-    s.next('next');
-    s.complete();
-  });
+  const ob = new Subject<string>();
   const sub = observableToBehaviourSubject(ob, '');
+  ob.next('next');
+  setTimeout(() => ob.complete());
 
-  setTimeout(async () => {
-    expect(await lastValueFrom(sub)).toBe('next');
-  });
+  const value = await lastValueFrom(sub);
+  expect(value).toBe('next');
 });
 
 test('Test toObservable error', async () => {
