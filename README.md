@@ -1,7 +1,7 @@
 # Rx Observable State
 
 [![codecov](https://codecov.io/gh/HuiiBuh/rx-observable-state/branch/main/graph/badge.svg?token=PXJF5SIA22)](https://codecov.io/gh/HuiiBuh/rx-observable-state)
-[![NPM package](https://img.shields.io/npm/v/ngx-tiptap-editor.svg?logo=npm&logoColor=fff&label=NPM+package&color=rgb(49,199,84))](https://www.npmjs.com/package/ngx-tiptap-editor)
+[![NPM package](https://img.shields.io/npm/v/rx-observable-state.svg?logo=npm&logoColor=fff&label=NPM+package&color=rgb(49,199,84))](https://www.npmjs.com/package/rx-observable-state)
 
 ## Features
 
@@ -14,7 +14,7 @@
 
 ## Example
 
-For a more advanced example take a look at the [*example.ts*](./example.ts).
+For a more advanced example take a look at the [*example.ts*](https://github.com/HuiiBuh/rx-observable-state/blob/main/example.ts).
 
 ```typescript
 interface Todo {
