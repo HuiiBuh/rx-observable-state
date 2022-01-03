@@ -14,7 +14,8 @@
     "minifyJson": "jq -c . < assets/json1.json > assets/json1.tmp.json && jq -c . < assets/json2.json > assets/json2.tmp.json && mv assets/json1.tmp.json assets/json1.json && mv assets/json2.tmp.json assets/json2.json"
   },
   "peerDependencies": {
-    "rxjs": ">6"
+    "rxjs": ">6",
+    "ts-toolbelt": ">7"
   },
   "keywords": [
     "angular",
