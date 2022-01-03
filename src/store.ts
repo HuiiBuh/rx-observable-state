@@ -1,4 +1,4 @@
-import { BehaviorSubject, distinctUntilChanged, map, Observable } from 'rxjs';
+import { BehaviorSubject, defer, distinctUntilChanged, map, Observable } from 'rxjs';
 import { DispatcherFunctionParameter, DispatcherFunctions } from './dispatcher';
 
 import { deepEquals } from './equals';
@@ -29,7 +29,7 @@ export class Store<
 
   constructor(
     initialState: S,
-    { deepEqual = true, dispatcher, selector }: StoreConstructorOptions<DISPATCHER, SELECTOR> = {},
+    { deepEqual = false, dispatcher, selector }: StoreConstructorOptions<DISPATCHER, SELECTOR> = {},
   ) {
     super();
     this.comparator = deepEqual ? deepEquals : (a, b) => a === b;
@@ -75,7 +75,7 @@ export class Store<
   public dispatch<A extends DispatcherFunctions<NonNullable<DISPATCHER>>>(
     action: DISPATCHER extends undefined ? never : A,
     ...args: DISPATCHER extends undefined ? never[] : DispatcherFunctionParameter<NonNullable<DISPATCHER>[A], S>
-  ): void {
+  ): Observable<S> {
     if (!this.dispatcher) throw new Error('Pass a dispatcher to the constructor');
 
     const actionFunction = (this.dispatcher as NonNullable<DISPATCHER>)[action] as unknown as (
@@ -84,7 +84,10 @@ export class Store<
     if (!actionFunction) {
       throw new Error(`Action ${action} was not found in the dispatcher. Make sure that the action actually exists`);
     }
-    actionFunction.apply(this.dispatcher, [...args, this]);
+    return defer(async () => {
+      await actionFunction.apply(this.dispatcher, [...args, this]);
+      return this.state;
+    });
   }
 
   protected _on(path: Index[]): Observable<any> {

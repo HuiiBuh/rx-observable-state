@@ -1,4 +1,4 @@
-import { BehaviorSubject, combineLatest, distinctUntilChanged, map, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, defer, distinctUntilChanged, map, Observable, switchMap } from 'rxjs';
 import { DependableSelector, isDependableSelector, ISelector, isSelector, Selector } from './selector';
 import { Index } from './types';
 
@@ -48,7 +48,8 @@ export class SelectorCache<T extends object> {
 
   private observableFromSelector(selector: Index, executor: Selector<any>): BehaviorSubject<any> {
     const observable = this.store.pipe(
-      map((state) => executor.apply(this.selector, [state])),
+      // Selectors can be async
+      switchMap((state) => defer(async () => await executor.apply(this.selector, [state]))),
       distinctUntilChanged(this.comparator),
     );
     this.cache[selector] = observableToBehaviourSubject(observable);
