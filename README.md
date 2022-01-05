@@ -56,12 +56,12 @@ store.patch('huiibuh', 'username');
   
 `?` stands for values which are infered. These values are typesave!
 
-| name          | parameters                                                                                              | returns       | description                                                                       |
-|---------------|---------------------------------------------------------------------------------------------------------|---------------|-----------------------------------------------------------------------------------|
-| setState      | `state` __S__                                                                                                | void          | Completely replace the current state                                              |
-| patch         | `value` __?__, `...path` __?__ The accessor path to the property you want to update                                    | void          | Update the value at a specific position of the state                              |
-| on            | `...path` __?__ The accessor path to the property you want to subscribe to changes to                                              | Observable<?> | Get an observable which notifies you whenever the value behind the path changes   |
-| get           | `...path` __?__ The accessor path to the property you want to get                                              | ?             | The the value at a specific path. undefined if the path does not exist            |
+| name          | parameters                                                                                                              | returns        | description                                                                       |
+|---------------|-------------------------------------------------------------------------------------------------------------------------|----------------|-----------------------------------------------------------------------------------|
+| setState      | `state` __S__                                                                                                           | void           | Completely replace the current state                                              |
+| patch         | `value` __?__, `...path` __?__ The accessor path to the property you want to update                                     | void           | Update the value at a specific position of the state                              |
+| on            | `...path` __?__ The accessor path to the property you want to subscribe to changes to                                   | Observable<?>  | Get an observable which notifies you whenever the value behind the path changes   |
+| get           | `...path` __?__ The accessor path to the property you want to get                                                       | ?              | The the value at a specific path. undefined if the path does not exist            |
 | dispatch      | `dispatcher` __S__ The name of the dispatcher, `...args` __?[]__ Whatever arguments have to be passed to the dispatcher | Observable<S\> | Dispatch an action which in turn will update the state. Returns the updated state |
-| select        | `selector` __?__ The name of the selector                                                                      | Observable<?> | Select parts of the state with the name of a selector. Will update                |
-| selectCurrent | `selector` __?__ The name of the selector                                                                      | ?             | Get the current value of a selector                                               |
+| select        | `selector` __?__ The name of the selector                                                                               | Observable<?>  | Select parts of the state with the name of a selector. Will update                |
+| selectCurrent | `selector` __?__ The name of the selector                                                                               | ?              | Get the current value of a selector                                               |

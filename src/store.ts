@@ -72,9 +72,9 @@ export class Store<
     return this.selectorCache.get(selector);
   }
 
-  public dispatch<A extends DispatcherFunctions<NonNullable<DISPATCHER>>>(
-    action: DISPATCHER extends undefined ? never : A,
-    ...args: DISPATCHER extends undefined ? never[] : DispatcherFunctionParameter<NonNullable<DISPATCHER>[A], S>
+  public dispatch<D extends DispatcherFunctions<NonNullable<DISPATCHER>>>(
+    action: D,
+    ...args: DispatcherFunctionParameter<NonNullable<DISPATCHER>[D], S>
   ): Observable<S> {
     if (!this.dispatcher) throw new Error('Pass a dispatcher to the constructor');
 
