@@ -19,11 +19,15 @@ class Stack {
 }
 
 export const shallowEquals = (a: any, b: any) => a === b;
-export const arePrimitives = (...objects: any[]) => objects.every((o) => !(o instanceof Object));
+export const containsPrimitives = (...objects: any[]) => objects.some((o) => !(o instanceof Object));
 
 const comparator = (a: any, b: any): boolean | null => {
+  // First check if the objects are shallow equal. If this is true we can skip the whole other part
   if (shallowEquals(a, b)) return true;
-  if (arePrimitives(a, b)) return false;
+
+  // Check if one of them is a primitive and if yes we can assume that they are not equal, because the previous check
+  // was false
+  if (containsPrimitives(a, b)) return false;
   return null;
 };
 

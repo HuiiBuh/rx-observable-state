@@ -13,6 +13,23 @@ test('Check if null and undefined are equal', () => {
   expect(deepEquals(null, undefined)).toBe(false);
 });
 
+test('Check if equal function can deal with nullable values', () => {
+  expect(
+    deepEquals(
+      {
+        hello: {
+          world: {
+            how: false,
+          },
+        },
+      },
+      {
+        hello: null,
+      },
+    ),
+  ).toBe(false);
+});
+
 test('Check if two equal primitives are equal', () => {
   expect(deepEquals('my string', 'my string')).toBe(true);
 });

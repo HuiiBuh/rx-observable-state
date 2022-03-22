@@ -1,6 +1,6 @@
 {
   "name": "rx-observable-state",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
@@ -12,6 +12,10 @@
     "coverage": "jest --collect-coverage",
     "lint": "tslint -p tsconfig.json",
     "minifyJson": "jq -c . < assets/json1.json > assets/json1.tmp.json && jq -c . < assets/json2.json > assets/json2.tmp.json && mv assets/json1.tmp.json assets/json1.json && mv assets/json2.tmp.json assets/json2.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HuiiBuh/rx-observable-state"
   },
   "peerDependencies": {
     "rxjs": ">6",
